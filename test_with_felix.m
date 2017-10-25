@@ -1,6 +1,6 @@
-%one = get_trained_matrix('one');
-%two = get_trained_matrix('two');
-%three = get_trained_matrix('three');
+one = get_trained_matrix('one');
+two = get_trained_matrix('two');
+three = get_trained_matrix('three');
 
 'Done Training'
 

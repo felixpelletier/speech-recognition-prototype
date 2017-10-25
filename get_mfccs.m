@@ -38,7 +38,7 @@ for j = 400:160:length(audio)
     mfcc = dct(log_energy);
     if (mfcc(1) > -25)
         mfcc = mfcc(1:mfcc_count);
-        mfcc = mfcc / mfcc(1);
+        %mfcc = mfcc / mfcc(1);
         mfccs = [mfccs mfcc];
     end
 end

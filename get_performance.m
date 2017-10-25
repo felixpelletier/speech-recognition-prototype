@@ -1,10 +1,10 @@
-one = get_trained_matrix('one');
-two = get_trained_matrix('two');
-three = get_trained_matrix('three');
+one = get_trained_matrix('google_dataset/one');
+two = get_trained_matrix('google_dataset/two');
+three = get_trained_matrix('google_dataset/three');
 
 'Done Training'
 
-test_files = get_files_for_word('two');
+test_files = get_files_for_word('google_dataset/two');
 success = 0;
 file_count = 0;
 total = length(test_files)-100
@@ -21,7 +21,5 @@ for i = 1001:1201
     end
     file_count = file_count + 1
 end
-
-
 
 (success/file_count) * 100

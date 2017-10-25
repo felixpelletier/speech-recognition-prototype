@@ -1,10 +1,14 @@
-one = get_trained_matrix('one');
-two = get_trained_matrix('two');
-three = get_trained_matrix('three');
+one = get_trained_matrix('google_dataset/one');
+two = get_trained_matrix('google_dataset/two');
+three = get_trained_matrix('google_dataset/three');
 
 'Done Training'
 
-test_files = {'felix_one.wav', 'felix_two.wav', 'felix_three.wav'};
+test_files = {
+    'custom_dataset/felix_one.wav', ...
+    'custom_dataset/felix_two.wav', ...
+    'custom_dataset/felix_three.wav' ...
+ };
 results = zeros(length(test_files), 1);
 for i = 1:length(test_files)
     test_file = test_files{i};

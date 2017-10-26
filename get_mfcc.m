@@ -1,4 +1,4 @@
-function [ mfccs ] = get_mfccs( file_path )
+function [ mfcc ] = get_mfcc( audio )
 
 fourier_length = 256;
 bank_count = 26;
@@ -24,22 +24,12 @@ for i = 1:bank_count
 end
 
 mfcc_count = 12;
-
-mfccs = zeros(mfcc_count, 0);
-[audio, Fs] = audioread(file_path);
-for j = 400:160:length(audio)
-    slice = audio(j-400+1:j);
-    f_25ms = abs(fft(slice .* hamming(400), fourier_length*2)).^2;
-    f_25ms = f_25ms(1:fourier_length) ./ (fourier_length);
-    log_energy = zeros(bank_count, 1);
-    for k = 1:bank_count
-        log_energy(k) = log10(sum(f_25ms.*banks(:,k)));
-    end
-    mfcc = dct(log_energy);
-    if (mfcc(1) > -25)
-        mfcc = mfcc(1:mfcc_count);
-        %mfcc = mfcc / mfcc(1);
-        mfccs = [mfccs mfcc];
-    end
+f_25ms = abs(fft(audio .* hamming(400), fourier_length*2)).^2;
+f_25ms = f_25ms(1:fourier_length) ./ (fourier_length);
+log_energy = zeros(bank_count, 1);
+for k = 1:bank_count
+    log_energy(k) = log10(sum(f_25ms.*banks(:,k)));
 end
+mfcc = dct(log_energy);
+mfcc = mfcc(1:mfcc_count);
 

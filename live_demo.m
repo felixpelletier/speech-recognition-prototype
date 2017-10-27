@@ -16,13 +16,18 @@ record(ai);
 
 samples_for_10ms = 0.01*Fs;
 samples_for_25ms = 0.025*Fs;
-buffer_25ms = zeros(0.025*Fs, 1);
+
+buffer_25ms = zeros(samples_for_25ms, 1);
 buffer_10ms = zeros(samples_for_10ms, 1);
 buffer_10ms_index = 1;
 
 newdata = zeros(0, 1);
 newdata_index = 1;
-last_datas = zeros(10, 1);
+last_datas = zeros(5, 1);
+
+last_mfccs = zeros(12, 5);
+last_detection = 0;
+new_detection = 0;
 % Keep acquiring data while "RUNNING" ~= 0
 while RUNNING
     % Acquire new input samples
@@ -39,17 +44,17 @@ while RUNNING
         
         buffer_25ms = [buffer_25ms(samples_for_10ms+1:end); buffer_10ms];
         mfcc = get_mfcc(buffer_25ms);
+        last_mfccs = [last_mfccs(:, 2:end) mfcc];
         if (mfcc(1) > -25)
-            one_likelyhood = get_likelyhood(mfcc, one);
-            two_likelyhood = get_likelyhood(mfcc, two);
-            three_likelyhood = get_likelyhood(mfcc, three);
+            one_likelyhood = get_likelyhood(last_mfccs, one);
+            two_likelyhood = get_likelyhood(last_mfccs, two);
+            three_likelyhood = get_likelyhood(last_mfccs, three);
             likelyhoods = [one_likelyhood two_likelyhood three_likelyhood];
-            most_likely = min(likelyhoods)
+            most_likely = min(likelyhoods)/size(last_mfccs, 2);
             if (most_likely < 20)
                 last_datas = [last_datas(2:end); find(likelyhoods == min(likelyhoods))];
-                if sum(last_datas==mode(last_datas)) > 5
-                    mode(last_datas)
-                end
+                last_detection = cputime;
+                new_detection = 1;
             end
         end
         
@@ -60,6 +65,13 @@ while RUNNING
         buffer_10ms(buffer_10ms_index:buffer_10ms_index+length(newdata)-1) = newdata;
         buffer_10ms_index = buffer_10ms_index+length(newdata);
         newdata = zeros(0, 1);
+    end
+    
+    if ((new_detection == 1) && (cputime > (last_detection+0.5)))
+        new_detection = 0;
+        if sum(last_datas==mode(last_datas)) > 3
+            detected = mode(last_datas)
+        end
     end
 end
 

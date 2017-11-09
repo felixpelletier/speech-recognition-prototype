@@ -1,6 +1,6 @@
-one = get_trained_matrix('google_dataset/one');
-two = get_trained_matrix('google_dataset/two');
-three = get_trained_matrix('google_dataset/three');
+%one = get_trained_matrix('google_dataset/one');
+%two = get_trained_matrix('google_dataset/two');
+%three = get_trained_matrix('google_dataset/three');
 
 'Done Training'
 

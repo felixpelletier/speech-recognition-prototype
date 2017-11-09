@@ -12,8 +12,7 @@ for i = 1:number_of_files
 end
 
 options = statset('MaxIter', 10000);
-trained_matrix = gmdistribution.fit(mfccs, 8, 'Options', options);
-
+trained_matrix = gmdistribution.fit(mfccs, 4, 'Options', options);
 
 end
 

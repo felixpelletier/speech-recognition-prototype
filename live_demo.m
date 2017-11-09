@@ -64,11 +64,10 @@ while RUNNING
                         one_likelyhood = get_likelyhood(last_mfccs, one);
                         two_likelyhood = get_likelyhood(last_mfccs, two);
                         three_likelyhood = get_likelyhood(last_mfccs, three);
-                        likelyhoods = [one_likelyhood two_likelyhood three_likelyhood]
-                        most_likely = max(likelyhoods)/size(last_mfccs, 2);
-                        least_likely = min(likelyhoods)/size(last_mfccs, 2);
-                        likelyness_delta = exp(abs(most_likely-least_likely))
-                        if (likelyness_delta > 300)
+                        likelyhoods = [one_likelyhood -Inf three_likelyhood]
+                        most_likely = max(likelyhoods)/size(last_mfccs, 2)
+                        likelyness_delta = 1.1^abs(one_likelyhood-three_likelyhood)
+                        if (likelyness_delta > 1e5)
                             %last_datas = [last_datas(2:end); find(likelyhoods == min(likelyhoods))];
                             %last_detection = cputime;
                             %new_detection = 1;

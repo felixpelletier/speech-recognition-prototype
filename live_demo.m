@@ -25,9 +25,12 @@ newdata = zeros(0, 1);
 newdata_index = 1;
 last_datas = zeros(5, 1);
 
-last_mfccs = zeros(12, 5);
+last_mfccs = zeros(12, 0);
 last_detection = 0;
 new_detection = 0;
+frames_since_low_edge = 0;
+is_recording = 0;
+amplitude_threshold = -35;
 % Keep acquiring data while "RUNNING" ~= 0
 while RUNNING
     % Acquire new input samples
@@ -43,19 +46,39 @@ while RUNNING
         newdata = newdata(data_until_buffer_full+1:end);
         
         buffer_25ms = [buffer_25ms(samples_for_10ms+1:end); buffer_10ms];
-        mfcc = get_mfcc(buffer_25ms);
-        last_mfccs = [last_mfccs(:, 2:end) mfcc];
-        if (mfcc(1) > -25)
-            one_likelyhood = get_likelyhood(last_mfccs, one);
-            two_likelyhood = get_likelyhood(last_mfccs, two);
-            three_likelyhood = get_likelyhood(last_mfccs, three);
-            likelyhoods = [one_likelyhood two_likelyhood three_likelyhood];
-            most_likely = min(likelyhoods)/size(last_mfccs, 2);
-            if (most_likely < 20)
-                last_datas = [last_datas(2:end); find(likelyhoods == min(likelyhoods))];
-                last_detection = cputime;
-                new_detection = 1;
-            end
+        amplitude = 20*log10(sqrt(sum(buffer_25ms.^2)/samples_for_25ms));
+        if (is_recording == 0 && amplitude > amplitude_threshold)
+            is_recording = 1;
+            frames_since_low_edge = 0;
+            last_mfccs = zeros(12, 0);
+        end
+        
+        if (is_recording)
+            mfcc = get_mfcc(buffer_25ms);
+            if (amplitude < amplitude_threshold)
+                frames_since_low_edge = frames_since_low_edge + 1;
+                if (frames_since_low_edge > 20)
+                    is_recording = 0;
+                    %last_mfccs = last_mfccs(:, 1:valid_mfccs);
+                    if (1 || mfcc(1) > -25)
+                        one_likelyhood = get_likelyhood(last_mfccs, one);
+                        two_likelyhood = get_likelyhood(last_mfccs, two);
+                        three_likelyhood = get_likelyhood(last_mfccs, three);
+                        likelyhoods = [one_likelyhood two_likelyhood three_likelyhood]
+                        most_likely = max(likelyhoods)/size(last_mfccs, 2);
+                        least_likely = min(likelyhoods)/size(last_mfccs, 2);
+                        likelyness_delta = exp(abs(most_likely-least_likely))
+                        if (likelyness_delta > 300)
+                            %last_datas = [last_datas(2:end); find(likelyhoods == min(likelyhoods))];
+                            %last_detection = cputime;
+                            %new_detection = 1;
+                            found = find(likelyhoods == max(likelyhoods))
+                        end
+                    end
+                end
+            else
+                last_mfccs = [last_mfccs mfcc];
+            end    
         end
         
         buffer_10ms_index = min([samples_for_10ms length(newdata)+1]);
@@ -67,12 +90,12 @@ while RUNNING
         newdata = zeros(0, 1);
     end
     
-    if ((new_detection == 1) && (cputime > (last_detection+0.5)))
-        new_detection = 0;
-        if sum(last_datas==mode(last_datas)) > 3
-            detected = mode(last_datas)
-        end
-    end
+%     if ((new_detection == 1) && (cputime > (last_detection+0.5)))
+%         new_detection = 0;
+%         if sum(last_datas==mode(last_datas)) > 3
+%             detected = mode(last_datas)
+%         end
+%     end
 end
 
 % Stop acquisition

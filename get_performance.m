@@ -10,12 +10,12 @@ file_count = 0;
 total = length(test_files)-100
 for i = 1001:1201
     test_file = test_files{i};
-    mfccs = get_mfccs(test_file);
+    mfccs = get_mfccs_from_file(test_file);
     one_likelyhood = get_likelyhood(mfccs, one);
     two_likelyhood = get_likelyhood(mfccs, two);
     three_likelyhood = get_likelyhood(mfccs, three);
     likelyhoods = [one_likelyhood two_likelyhood three_likelyhood];
-    digit = find(likelyhoods == min(likelyhoods));
+    digit = find(likelyhoods == max(likelyhoods));
     if (digit == 2)
         success = success + 1;
     end

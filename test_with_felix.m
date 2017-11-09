@@ -1,6 +1,6 @@
-one = get_trained_matrix('google_dataset/one');
-two = get_trained_matrix('google_dataset/two');
-three = get_trained_matrix('google_dataset/three');
+%one = get_trained_matrix('google_dataset/one');
+%two = get_trained_matrix('google_dataset/two');
+%three = get_trained_matrix('google_dataset/three');
 
 'Done Training'
 
@@ -19,7 +19,7 @@ for i = 1:length(test_files)
 
     likelyhoods = [one_likelyhood two_likelyhood three_likelyhood]
 
-    results(i) = find(likelyhoods == min(likelyhoods));
+    results(i) = find(likelyhoods == max(likelyhoods));
 end
 
 results

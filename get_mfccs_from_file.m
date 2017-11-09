@@ -5,8 +5,9 @@ mfccs = zeros(mfcc_count, 0);
 [audio, Fs] = audioread(file_path);
 for j = 400:160:length(audio)
     slice = audio(j-400+1:j);
-    mfcc = get_mfcc(slice);
-    if (mfcc(1) > -25)
+    amplitude = 20*log10(sqrt(sum(slice.^2)/400));
+    if (amplitude > -45)
+        mfcc = get_mfcc(slice);
         mfccs = [mfccs mfcc];
     end
 end

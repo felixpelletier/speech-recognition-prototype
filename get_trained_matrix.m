@@ -1,6 +1,6 @@
 function [ trained_matrix ] = get_trained_matrix( word )
 
-number_of_files = 25;
+number_of_files = 50;
 
 files = get_files_for_word(word);
 

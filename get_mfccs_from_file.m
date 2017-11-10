@@ -12,4 +12,10 @@ for j = 400:160:length(audio)
     end
 end
 
+d = diff(mfccs, 1,2);
+dd = diff(mfccs, 2,2);
+mfccs = [mfccs(:, 3:end); d(:, 2:end); dd];
+
+
+
 end

@@ -1,4 +1,4 @@
-function [ trained_matrix ] = get_trained_matrix( word )
+function [ trained_matrix, mfccs ] = get_trained_matrix( word )
 
 number_of_files = 50;
 
@@ -12,7 +12,7 @@ for i = 1:number_of_files
 end
 
 options = statset('MaxIter', 10000);
-trained_matrix = gmdistribution.fit(mfccs, 4, 'Options', options);
+trained_matrix = gmdistribution.fit(mfccs(:,1), 4, 'Options', options);
 
 end
 

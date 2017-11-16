@@ -1,6 +1,6 @@
-%one = get_trained_matrix('google_dataset/one');
-%two = get_trained_matrix('google_dataset/two');
-%three = get_trained_matrix('google_dataset/three');
+one = get_trained_matrix('google_dataset/one');
+two = get_trained_matrix('google_dataset/two');
+three = get_trained_matrix('google_dataset/three');
 
 'Done Training'
 
@@ -46,11 +46,16 @@ while RUNNING
         newdata = newdata(data_until_buffer_full+1:end);
         
         buffer_25ms = [buffer_25ms(samples_for_10ms+1:end); buffer_10ms];
+        
         amplitude = 20*log10(sqrt(sum(buffer_25ms.^2)/samples_for_25ms));
         if (is_recording == 0 && amplitude > amplitude_threshold)
             is_recording = 1;
             frames_since_low_edge = 0;
             last_mfccs = zeros(12, 0);
+        end
+        
+        if (is_recording == 0)
+            %zero_crossings_when_low = zero_crossing_count(buffer_25ms)
         end
         
         if (is_recording)
@@ -65,9 +70,10 @@ while RUNNING
                         two_likelyhood = get_likelyhood(last_mfccs, two);
                         three_likelyhood = get_likelyhood(last_mfccs, three);
                         likelyhoods = [one_likelyhood -Inf three_likelyhood]
-                        most_likely = max(likelyhoods)/size(last_mfccs, 2)
-                        likelyness_delta = 1.1^abs(one_likelyhood-three_likelyhood)
-                        if (likelyness_delta > 1e5)
+                        likelyhoods = likelyhoods/size(last_mfccs, 2);
+                        most_likely = max(likelyhoods);
+                        likelyness_delta = 2^abs(one_likelyhood-three_likelyhood)
+                        if (likelyness_delta > 1e2)
                             %last_datas = [last_datas(2:end); find(likelyhoods == min(likelyhoods))];
                             %last_detection = cputime;
                             %new_detection = 1;
@@ -76,6 +82,8 @@ while RUNNING
                     end
                 end
             else
+                %zero_crossings_when_high = zero_crossing_count(buffer_25ms)
+                %plot(buffer_25ms)
                 last_mfccs = [last_mfccs mfcc];
             end    
         end

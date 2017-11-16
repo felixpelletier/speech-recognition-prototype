@@ -29,6 +29,7 @@ if isempty(banks)
     
 end
 
+audio = filter([1 -0.97], 1, audio);
 f_25ms = abs(fft(audio .* hamming(400), fourier_length*2)).^2;
 f_25ms = f_25ms(1:fourier_length) ./ (fourier_length);
 log_energy = zeros(bank_count, 1);

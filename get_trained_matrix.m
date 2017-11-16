@@ -1,6 +1,6 @@
 function [ trained_matrix ] = get_trained_matrix( word )
 
-number_of_files = 50;
+number_of_files = 100;
 
 files = get_files_for_word(word);
 
@@ -12,7 +12,7 @@ for i = 1:number_of_files
 end
 
 options = statset('MaxIter', 10000);
-trained_matrix = gmdistribution.fit(mfccs, 4, 'Options', options);
+trained_matrix = gmdistribution.fit(mfccs, 4, 'CovType', 'diagonal', 'Options', options);
 
 end
 

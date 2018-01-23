@@ -1,55 +1,16 @@
-one = get_trained_matrix('google_dataset/one');
-two = get_trained_matrix('google_dataset/two');
-three = get_trained_matrix('google_dataset/three');
+one = get_trained_matrix('google_dataset/one', 'NumberMFCCKept', 12, 'NumberMFCCCalculated', 26);
+two = get_trained_matrix('google_dataset/two', 'NumberMFCCKept', 12, 'NumberMFCCCalculated', 26);
+three = get_trained_matrix('google_dataset/three', 'NumberMFCCKept', 12, 'NumberMFCCCalculated', 26);
+
+trained_matrices = {one, two, three};
 
 'Done Training'
 
-test_files = get_files_for_word('google_dataset/one');
-success = 0;
-file_count = 0;
-total = length(test_files)-100
-for i = 1001:1201
-    test_file = test_files{i};
-    mfccs = get_mfccs_from_file(test_file);
-    one_likelyhood = get_likelyhood(mfccs, one);
-    two_likelyhood = get_likelyhood(mfccs, two);
-    three_likelyhood = get_likelyhood(mfccs, three);
-    likelyhoods = [one_likelyhood two_likelyhood three_likelyhood];
-    digit = find(likelyhoods == max(likelyhoods));
-    if (digit == 1)
-        success = success + 1;
-    end
-    file_count = file_count + 1
-end
+[success_one, file_count_one] = get_performance_for_word('google_dataset/one', trained_matrices, 1, 20, 1001);
+[success_two, file_count_two] = get_performance_for_word('google_dataset/two', trained_matrices, 2, 20, 1001);
+[success_three, file_count_three] = get_performance_for_word('google_dataset/three', trained_matrices, 3, 20, 1001);
 
-test_files = get_files_for_word('google_dataset/two');
-for i = 1001:1201
-    test_file = test_files{i};
-    mfccs = get_mfccs_from_file(test_file);
-    one_likelyhood = get_likelyhood(mfccs, one);
-    two_likelyhood = get_likelyhood(mfccs, two);
-    three_likelyhood = get_likelyhood(mfccs, three);
-    likelyhoods = [one_likelyhood two_likelyhood three_likelyhood];
-    digit = find(likelyhoods == max(likelyhoods));
-    if (digit == 2)
-        success = success + 1;
-    end
-    file_count = file_count + 1
-end
+success = success_one + success_two + success_three;
+file_count = file_count_one + file_count_two + file_count_three;
 
-test_files = get_files_for_word('google_dataset/three');
-for i = 1001:1201
-    test_file = test_files{i};
-    mfccs = get_mfccs_from_file(test_file);
-    one_likelyhood = get_likelyhood(mfccs, one);
-    two_likelyhood = get_likelyhood(mfccs, two);
-    three_likelyhood = get_likelyhood(mfccs, three);
-    likelyhoods = [one_likelyhood two_likelyhood three_likelyhood];
-    digit = find(likelyhoods == max(likelyhoods));
-    if (digit == 3)
-        success = success + 1;
-    end
-    file_count = file_count + 1
-end
-
-(success/file_count) * 100
+percentage = (success/file_count) * 100

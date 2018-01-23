@@ -1,11 +1,17 @@
-function [ mfcc ] = get_mfcc( audio )
+function [ mfcc ] = get_mfcc( audio, varargin )
 
 persistent fourier_length bank_count mfcc_count banks;
 
-if isempty(banks)
+parser = inputParser;
+addParameter(parser,'NumberMFCCKept', 12);
+addParameter(parser,'NumberMFCCCalculated', 26);
+parse(parser, varargin{:});
+args = parser.Results;
+
+if isempty(banks) || bank_count ~= args.NumberMFCCCalculated || mfcc_count ~= args.NumberMFCCKept
     fourier_length = 256;
-    bank_count = 26;
-    mfcc_count = 12;
+    bank_count = args.NumberMFCCCalculated;
+    mfcc_count = args.NumberMFCCKept;
     fs = 16000;
     upper_mels = freq2mels(fs/2);
     lower_mels = freq2mels(300);

@@ -1,12 +1,14 @@
 OUT_PATH = 'performance_result.txt';
-FILE_COUNT = 1000;
+FILE_COUNT = 250;
+FILE_COUNT_FOR_TRAINING = 50;
 fclose(fopen(OUT_PATH,'w'));
 
-for NumberMFCCCalculated = 13:30
-    for NumberMFCCKept = 4:12
-        one = get_trained_matrix('google_dataset/one', 'NumberMFCCKept', NumberMFCCKept, 'NumberMFCCCalculated', NumberMFCCCalculated);
-        two = get_trained_matrix('google_dataset/two', 'NumberMFCCKept', NumberMFCCKept, 'NumberMFCCCalculated', NumberMFCCCalculated);
-        three = get_trained_matrix('google_dataset/three', 'NumberMFCCKept', NumberMFCCKept, 'NumberMFCCCalculated', NumberMFCCCalculated);
+for NumberMFCCCalculated = 5:30
+    max_kept = min(NumberMFCCCalculated-1, 12);
+    for NumberMFCCKept = 2:max_kept
+        one = get_trained_matrix('google_dataset/one', 'NumberMFCCKept', NumberMFCCKept, 'NumberMFCCCalculated', NumberMFCCCalculated, 'MaxNumberOfFiles', FILE_COUNT_FOR_TRAINING);
+        two = get_trained_matrix('google_dataset/two', 'NumberMFCCKept', NumberMFCCKept, 'NumberMFCCCalculated', NumberMFCCCalculated, 'MaxNumberOfFiles', FILE_COUNT_FOR_TRAINING);
+        three = get_trained_matrix('google_dataset/three', 'NumberMFCCKept', NumberMFCCKept, 'NumberMFCCCalculated', NumberMFCCCalculated, 'MaxNumberOfFiles', FILE_COUNT_FOR_TRAINING);
         
         trained_matrices = {one, two, three};
 

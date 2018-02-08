@@ -1,6 +1,11 @@
-one = get_trained_matrix('google_dataset/one');
-two = get_trained_matrix('google_dataset/two');
-three = get_trained_matrix('google_dataset/three');
+NumberMFCCKept = 12;
+NumberMFCCCalculated = 22;
+MinimumAmplitude = -35;
+MaxNumberOfFiles = 100;
+
+one = get_trained_matrix('custom_dataset/one', 'NumberMFCCKept', NumberMFCCKept, 'NumberMFCCCalculated', NumberMFCCCalculated, 'MinimumAmplitude', MinimumAmplitude, 'MaxNumberOfFiles', MaxNumberOfFiles);
+%two = get_trained_matrix('google_dataset/two', 'NumberMFCCKept', NumberMFCCKept, 'NumberMFCCCalculated', NumberMFCCCalculated, 'MinimumAmplitude', MinimumAmplitude, 'MaxNumberOfFiles', MaxNumberOfFiles);
+three = get_trained_matrix('custom_dataset/three', 'NumberMFCCKept', NumberMFCCKept, 'NumberMFCCCalculated', NumberMFCCCalculated, 'MinimumAmplitude', MinimumAmplitude, 'MaxNumberOfFiles', MaxNumberOfFiles);
 
 'Done Training'
 
@@ -14,8 +19,9 @@ ai = audiorecorder(Fs, 16, 1);
 
 record(ai);
 
-samples_for_10ms = 0.01*Fs;
-samples_for_25ms = 0.025*Fs;
+time_multiplier = 8;
+samples_for_10ms = 0.01*Fs*time_multiplier;
+samples_for_25ms = 0.025*Fs*time_multiplier;
 
 buffer_25ms = zeros(samples_for_25ms, 1);
 buffer_10ms = zeros(samples_for_10ms, 1);
@@ -31,6 +37,7 @@ new_detection = 0;
 frames_since_low_edge = 0;
 is_recording = 0;
 amplitude_threshold = -35;
+last_amplitudes = -Inf*ones(1000/25, 1); % One new amplitude compute every 25ms
 % Keep acquiring data while "RUNNING" ~= 0
 while RUNNING
     % Acquire new input samples
@@ -48,6 +55,8 @@ while RUNNING
         buffer_25ms = [buffer_25ms(samples_for_10ms+1:end); buffer_10ms];
         
         amplitude = 20*log10(sqrt(sum(buffer_25ms.^2)/samples_for_25ms));
+        
+        %amplitude_threshold = mean(last_amplitudes) + 10;
         if (is_recording == 0 && amplitude > amplitude_threshold)
             is_recording = 1;
             frames_since_low_edge = 0;
@@ -59,21 +68,21 @@ while RUNNING
         end
         
         if (is_recording)
-            mfcc = get_mfcc(buffer_25ms);
+            mfcc = get_mfcc(buffer_25ms, 'NumberMFCCCalculated', NumberMFCCCalculated);
             if (amplitude < amplitude_threshold)
                 frames_since_low_edge = frames_since_low_edge + 1;
                 if (frames_since_low_edge > 20)
                     is_recording = 0;
                     %last_mfccs = last_mfccs(:, 1:valid_mfccs);
-                    if (1 || mfcc(1) > -25)
+                    if (1||size(last_mfccs, 2) > 10)
                         one_likelyhood = get_likelyhood(last_mfccs, one);
-                        two_likelyhood = get_likelyhood(last_mfccs, two);
+                        %two_likelyhood = get_likelyhood(last_mfccs, two);
                         three_likelyhood = get_likelyhood(last_mfccs, three);
-                        likelyhoods = [one_likelyhood -Inf three_likelyhood]
-                        likelyhoods = likelyhoods/size(last_mfccs, 2);
-                        most_likely = max(likelyhoods);
-                        likelyness_delta = 2^abs(one_likelyhood-three_likelyhood)
-                        if (likelyness_delta > 1e2)
+                        likelyhoods = [one_likelyhood -Inf three_likelyhood];
+                        %likelyhoods = likelyhoods/size(last_mfccs, 2);
+                        likelyhoods
+                        likelyhood_sum = mean([one_likelyhood three_likelyhood])
+                        if (max(likelyhoods) > -600 )
                             %last_datas = [last_datas(2:end); find(likelyhoods == min(likelyhoods))];
                             %last_detection = cputime;
                             %new_detection = 1;
@@ -87,6 +96,8 @@ while RUNNING
                 last_mfccs = [last_mfccs mfcc];
             end    
         end
+        
+        last_amplitudes = [last_amplitudes(2:end); amplitude];
         
         buffer_10ms_index = min([samples_for_10ms length(newdata)+1]);
         buffer_10ms(1:buffer_10ms_index-1) = newdata(1:buffer_10ms_index-1);

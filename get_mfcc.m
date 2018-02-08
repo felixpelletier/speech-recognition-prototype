@@ -11,7 +11,7 @@ parse(parser, varargin{:});
 args = parser.Results;
 
 if isempty(banks) || bank_count ~= args.NumberMFCCCalculated || mfcc_count ~= args.NumberMFCCKept
-    fourier_length = 256;
+    fourier_length = 1024;
     bank_count = args.NumberMFCCCalculated;
     mfcc_count = args.NumberMFCCKept;
     fs = 16000;
@@ -38,9 +38,9 @@ if isempty(banks) || bank_count ~= args.NumberMFCCCalculated || mfcc_count ~= ar
     
 end
 
-%target_amplitude = power(10, args.TargetLogAmplitudeRMS/20);
-%amplitude = sqrt(mean(audio.^2));
-%audio = audio*(target_amplitude/amplitude);
+target_amplitude = power(10, args.TargetLogAmplitudeRMS/20);
+amplitude = sqrt(mean(audio.^2));
+audio = audio*(target_amplitude/amplitude);
 %amplitude = sqrt(mean(audio.^2));
 %log_amplitude = 20*log10(amplitude)
 

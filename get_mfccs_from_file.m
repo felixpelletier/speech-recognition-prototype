@@ -16,6 +16,10 @@ mfcc_count = args.NumberMFCCKept;
 mfccs = zeros(mfcc_count, 0);
 [audio, Fs] = audioread(file_path);
 
+%Reduce to 12 bits
+audio = audio.*(((2^15)-1)/(2^4));
+audio = round(audio)/((2^11)-1);
+
 % Peak normalization
 audio = audio/max(audio);
 

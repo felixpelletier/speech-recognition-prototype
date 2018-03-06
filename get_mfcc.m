@@ -11,7 +11,7 @@ parse(parser, varargin{:});
 args = parser.Results;
 
 if isempty(banks) || bank_count ~= args.NumberMFCCCalculated || mfcc_count ~= args.NumberMFCCKept
-    fourier_length = 1024;
+    fourier_length = 256;
     bank_count = args.NumberMFCCCalculated;
     mfcc_count = args.NumberMFCCKept;
     fs = 16000;
@@ -38,24 +38,33 @@ if isempty(banks) || bank_count ~= args.NumberMFCCCalculated || mfcc_count ~= ar
     
 end
 
-target_amplitude = power(10, args.TargetLogAmplitudeRMS/20);
-amplitude = sqrt(mean(audio.^2));
-audio = audio*(target_amplitude/amplitude);
+% Removed just to be conformant with the C version
+%target_amplitude = power(10, args.TargetLogAmplitudeRMS/20);
+%amplitude = sqrt(mean(audio.^2));
+%audio = audio*(target_amplitude/amplitude);
+
+
 %amplitude = sqrt(mean(audio.^2));
 %log_amplitude = 20*log10(amplitude)
 
 audio = filter([1 -0.97], 1, audio);
-f_25ms = abs(fft(audio .* hamming(length(audio)), fourier_length*2)).^2;
-f_25ms = f_25ms(1:fourier_length) ./ (fourier_length);
+audio = audio .* hamming(length(audio));
+raw_fft = fft(audio, fourier_length*2);
+f_25ms = abs(raw_fft).^2;
+f_25ms = f_25ms(1:fourier_length) ./ (fourier_length*2);
 log_energy = zeros(bank_count, 1);
 for k = 1:bank_count
     log_energy(k) = log10(sum(f_25ms.*banks(:,k)));
 end
+
 mfcc = dct(log_energy);
 
 %average = mfcc(1)
 %mfcc = mfcc(1:mfcc_count);
 mfcc = mfcc(2:mfcc_count+1);
+
+
+
 if args.NormalizeMFCC
     %mfcc = 20 * mfcc / average;
 end

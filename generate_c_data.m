@@ -42,41 +42,48 @@ fprintf(headerId, '} %s_t;\n', struct_name);
 
 fprintf(headerId, '\n');
 
-fprintf(headerId, 'const %s_t TRAINING_DATA[] = {\n', struct_name);
-
-for i = 1:length(words)
-    trained_matrix = trained_matrices{i};
-    fprintf(headerId, '    {\n');
-    fprintf(headerId, '        {\n');
-    for j = 1:trained_matrix.NumComponents
-        fprintf(headerId, '            {\n');
-        fprintf(headerId, '                %.6gf,\n', trained_matrix.ComponentProportion(j));
-        fprintf(headerId, '                {');
-        for k = 1:trained_matrix.NumVariables
-            fprintf(headerId, '%.6gf', trained_matrix.mu(j, k));
-            if (k < trained_matrix.NumVariables)
-                fprintf(headerId, ', ');
-            end
-        end
-        fprintf(headerId, '},\n');
-        fprintf(headerId, '                {');
-        for k = 1:trained_matrix.NumVariables
-            fprintf(headerId, '%.6gf', trained_matrix.Sigma(1, k, j));
-            if (k < trained_matrix.NumVariables)
-                fprintf(headerId, ', ');
-            end
-        end
-        fprintf(headerId, '}\n');
-        fprintf(headerId, '            },\n');
-    end
-    fprintf(headerId, '        },\n');
-    fprintf(headerId, '    },\n');
-end
-
-fprintf(headerId, '};\n');
+fprintf(headerId, 'extern const %s_t TRAINING_DATA[%i];\n', struct_name, length(words));
 
 fprintf(headerId, '#endif //%s\n', guard_name);
 fclose(headerId);
+
+sourceId = fopen(source_path, 'w');
+
+fprintf(sourceId, '#include "%s.h"\n\n', filename);
+
+fprintf(sourceId, 'const %s_t TRAINING_DATA[] = {\n', struct_name);
+
+for i = 1:length(words)
+    trained_matrix = trained_matrices{i};
+    fprintf(sourceId, '    {\n');
+    fprintf(sourceId, '        {\n');
+    for j = 1:trained_matrix.NumComponents
+        fprintf(sourceId, '            {\n');
+        fprintf(sourceId, '                %.6gf,\n', trained_matrix.ComponentProportion(j));
+        fprintf(sourceId, '                {');
+        for k = 1:trained_matrix.NumVariables
+            fprintf(sourceId, '%.6gf', trained_matrix.mu(j, k));
+            if (k < trained_matrix.NumVariables)
+                fprintf(sourceId, ', ');
+            end
+        end
+        fprintf(sourceId, '},\n');
+        fprintf(sourceId, '                {');
+        for k = 1:trained_matrix.NumVariables
+            fprintf(sourceId, '%.6gf', trained_matrix.Sigma(1, k, j));
+            if (k < trained_matrix.NumVariables)
+                fprintf(sourceId, ', ');
+            end
+        end
+        fprintf(sourceId, '}\n');
+        fprintf(sourceId, '            },\n');
+    end
+    fprintf(sourceId, '        },\n');
+    fprintf(sourceId, '    },\n');
+end
+
+fprintf(sourceId, '};\n');
+fclose(sourceId);
 
 end
 

@@ -1,5 +1,7 @@
- vFILE_COUNT = 250;
+FILE_COUNT = 250;
 FILE_COUNT_FOR_TRAINING = 50;
+NumberMFCCKept = 12;
+NumberMFCCCalculated = 26;
 
 %one = get_trained_matrix('google_dataset/one', 'NumberMFCCKept', NumberMFCCKept, 'NumberMFCCCalculated', NumberMFCCCalculated, 'MaxNumberOfFiles', FILE_COUNT_FOR_TRAINING);
 %two = get_trained_matrix('google_dataset/two', 'NumberMFCCKept', NumberMFCCKept, 'NumberMFCCCalculated', NumberMFCCCalculated, 'MaxNumberOfFiles', FILE_COUNT_FOR_TRAINING);

@@ -20,12 +20,20 @@ if isempty(banks) || bank_count ~= args.NumberMFCCCalculated || mfcc_count ~= ar
     lower_mels = freq2mels(300);
     mels_bank = linspace(lower_mels, upper_mels, bank_count+2);
     freq_bank = arrayfun(@(x) mels2freq(x), mels_bank);
-    freq_bank = floor((fourier_length*2+1)*freq_bank/fs);
+    freq_bank = floor((fourier_length*2)*freq_bank/fs);
     banks = zeros(fourier_length, bank_count);
     for i = 1:bank_count
         lower_freq = freq_bank(i);
         higher_freq = freq_bank(i+2);
         mid_freq = (lower_freq+higher_freq)/2;
+
+        % FIXME
+        % Here j should be [lower_freq+1:higher_freq+1] because the Mel
+        % scale starts at 0. So, for example, lower_freq = 9 is the 10th
+        % element in the array. As we are doing right now, all our
+        % triangle filters are shifted to the left on the frequency axis,
+        % but it doesn't matter as the same shift is applied on both the
+        % training data and the input signal.
         for j = lower_freq:higher_freq
             if (j < mid_freq)
                 banks(j, i) = (j-lower_freq)/(mid_freq-lower_freq);
@@ -33,9 +41,7 @@ if isempty(banks) || bank_count ~= args.NumberMFCCCalculated || mfcc_count ~= ar
                 banks(j, i) = 1-((j-mid_freq)/(higher_freq-mid_freq));
             end
         end
-
     end
-    
 end
 
 % Removed just to be conformant with the C version

@@ -3,9 +3,15 @@ NumberMFCCCalculated = 22;
 MinimumAmplitude = -35;
 MaxNumberOfFiles = 100;
 
-one = get_trained_matrix('custom_dataset/one', 'NumberMFCCKept', NumberMFCCKept, 'NumberMFCCCalculated', NumberMFCCCalculated, 'MinimumAmplitude', MinimumAmplitude, 'MaxNumberOfFiles', MaxNumberOfFiles);
-%two = get_trained_matrix('google_dataset/two', 'NumberMFCCKept', NumberMFCCKept, 'NumberMFCCCalculated', NumberMFCCCalculated, 'MinimumAmplitude', MinimumAmplitude, 'MaxNumberOfFiles', MaxNumberOfFiles);
-three = get_trained_matrix('custom_dataset/three', 'NumberMFCCKept', NumberMFCCKept, 'NumberMFCCCalculated', NumberMFCCCalculated, 'MinimumAmplitude', MinimumAmplitude, 'MaxNumberOfFiles', MaxNumberOfFiles);
+words = {'accueil'; 'clic'; 'lacher'; 'menu'; 'retour'; 'tenir'};
+
+accueil = get_trained_matrix('custom_dataset/accueil', 'NumberMFCCKept', NumberMFCCKept, 'NumberMFCCCalculated', NumberMFCCCalculated, 'MinimumAmplitude', MinimumAmplitude, 'MaxNumberOfFiles', MaxNumberOfFiles);
+clic = get_trained_matrix('custom_dataset/clic', 'NumberMFCCKept', NumberMFCCKept, 'NumberMFCCCalculated', NumberMFCCCalculated, 'MinimumAmplitude', MinimumAmplitude, 'MaxNumberOfFiles', MaxNumberOfFiles);
+lacher = get_trained_matrix('custom_dataset/lacher', 'NumberMFCCKept', NumberMFCCKept, 'NumberMFCCCalculated', NumberMFCCCalculated, 'MinimumAmplitude', MinimumAmplitude, 'MaxNumberOfFiles', MaxNumberOfFiles);
+menu = get_trained_matrix('custom_dataset/menu', 'NumberMFCCKept', NumberMFCCKept, 'NumberMFCCCalculated', NumberMFCCCalculated, 'MinimumAmplitude', MinimumAmplitude, 'MaxNumberOfFiles', MaxNumberOfFiles);
+retour = get_trained_matrix('custom_dataset/retour', 'NumberMFCCKept', NumberMFCCKept, 'NumberMFCCCalculated', NumberMFCCCalculated, 'MinimumAmplitude', MinimumAmplitude, 'MaxNumberOfFiles', MaxNumberOfFiles);
+tenir = get_trained_matrix('custom_dataset/tenir', 'NumberMFCCKept', NumberMFCCKept, 'NumberMFCCCalculated', NumberMFCCCalculated, 'MinimumAmplitude', MinimumAmplitude, 'MaxNumberOfFiles', MaxNumberOfFiles);
+
 
 'Done Training'
 
@@ -36,7 +42,7 @@ last_detection = 0;
 new_detection = 0;
 frames_since_low_edge = 0;
 is_recording = 0;
-amplitude_threshold = -35;
+amplitude_threshold = -25;
 last_amplitudes = -Inf*ones(1000/25, 1); % One new amplitude compute every 25ms
 % Keep acquiring data while "RUNNING" ~= 0
 while RUNNING
@@ -75,18 +81,22 @@ while RUNNING
                     is_recording = 0;
                     %last_mfccs = last_mfccs(:, 1:valid_mfccs);
                     if (1||size(last_mfccs, 2) > 10)
-                        one_likelyhood = get_likelyhood(last_mfccs, one);
-                        %two_likelyhood = get_likelyhood(last_mfccs, two);
-                        three_likelyhood = get_likelyhood(last_mfccs, three);
-                        likelyhoods = [one_likelyhood -Inf three_likelyhood];
+                        accueil_likelyhood = get_likelyhood(last_mfccs, accueil);
+                        clic_likelyhood = get_likelyhood(last_mfccs, clic);
+                        lacher_likelyhood = get_likelyhood(last_mfccs, lacher);
+                        menu_likelyhood = get_likelyhood(last_mfccs, menu);
+                        retour_likelyhood = get_likelyhood(last_mfccs, retour);
+                        tenir_likelyhood = get_likelyhood(last_mfccs, tenir);
+                        likelyhoods = [accueil_likelyhood clic_likelyhood lacher_likelyhood menu_likelyhood retour_likelyhood tenir_likelyhood];
                         %likelyhoods = likelyhoods/size(last_mfccs, 2);
                         likelyhoods
-                        likelyhood_sum = mean([one_likelyhood three_likelyhood])
-                        if (max(likelyhoods) > -600 )
+                        %likelyhood_sum = mean([one_likelyhood three_likelyhood])
+                        if (max(likelyhoods) > -100 )
                             %last_datas = [last_datas(2:end); find(likelyhoods == min(likelyhoods))];
                             %last_detection = cputime;
                             %new_detection = 1;
-                            found = find(likelyhoods == max(likelyhoods))
+                            found = find(likelyhoods == max(likelyhoods));
+                            words(found)
                         end
                     end
                 end

@@ -3,17 +3,15 @@ NumberMFCCCalculated = 22;
 MinimumAmplitude = -35;
 MaxNumberOfFiles = 100;
 
-words = {'accueil'; 'clic'; 'lacher'; 'menu'; 'retour'; 'tenir'};
+words = {'accueil'; 'clic'; 'lacher'; 'retour'; 'tenir'};
 
-accueil = get_trained_matrix('custom_dataset/accueil', 'NumberMFCCKept', NumberMFCCKept, 'NumberMFCCCalculated', NumberMFCCCalculated, 'MinimumAmplitude', MinimumAmplitude, 'MaxNumberOfFiles', MaxNumberOfFiles);
-clic = get_trained_matrix('custom_dataset/clic', 'NumberMFCCKept', NumberMFCCKept, 'NumberMFCCCalculated', NumberMFCCCalculated, 'MinimumAmplitude', MinimumAmplitude, 'MaxNumberOfFiles', MaxNumberOfFiles);
-lacher = get_trained_matrix('custom_dataset/lacher', 'NumberMFCCKept', NumberMFCCKept, 'NumberMFCCCalculated', NumberMFCCCalculated, 'MinimumAmplitude', MinimumAmplitude, 'MaxNumberOfFiles', MaxNumberOfFiles);
-menu = get_trained_matrix('custom_dataset/menu', 'NumberMFCCKept', NumberMFCCKept, 'NumberMFCCCalculated', NumberMFCCCalculated, 'MinimumAmplitude', MinimumAmplitude, 'MaxNumberOfFiles', MaxNumberOfFiles);
-retour = get_trained_matrix('custom_dataset/retour', 'NumberMFCCKept', NumberMFCCKept, 'NumberMFCCCalculated', NumberMFCCCalculated, 'MinimumAmplitude', MinimumAmplitude, 'MaxNumberOfFiles', MaxNumberOfFiles);
-tenir = get_trained_matrix('custom_dataset/tenir', 'NumberMFCCKept', NumberMFCCKept, 'NumberMFCCCalculated', NumberMFCCCalculated, 'MinimumAmplitude', MinimumAmplitude, 'MaxNumberOfFiles', MaxNumberOfFiles);
+accueil = get_trained_matrix('new_dataset/accueil', 'NumberMFCCKept', NumberMFCCKept, 'NumberMFCCCalculated', NumberMFCCCalculated, 'MinimumAmplitude', MinimumAmplitude, 'MaxNumberOfFiles', MaxNumberOfFiles);
+clic = get_trained_matrix('new_dataset/clic', 'NumberMFCCKept', NumberMFCCKept, 'NumberMFCCCalculated', NumberMFCCCalculated, 'MinimumAmplitude', MinimumAmplitude, 'MaxNumberOfFiles', MaxNumberOfFiles);
+lacher = get_trained_matrix('new_dataset/lacher', 'NumberMFCCKept', NumberMFCCKept, 'NumberMFCCCalculated', NumberMFCCCalculated, 'MinimumAmplitude', MinimumAmplitude, 'MaxNumberOfFiles', MaxNumberOfFiles);
+retour = get_trained_matrix('new_dataset/retour', 'NumberMFCCKept', NumberMFCCKept, 'NumberMFCCCalculated', NumberMFCCCalculated, 'MinimumAmplitude', MinimumAmplitude, 'MaxNumberOfFiles', MaxNumberOfFiles);
+tenir = get_trained_matrix('new_dataset/tenir', 'NumberMFCCKept', NumberMFCCKept, 'NumberMFCCCalculated', NumberMFCCCalculated, 'MinimumAmplitude', MinimumAmplitude, 'MaxNumberOfFiles', MaxNumberOfFiles);
 
-
-'Done Training'
+fprintf('Done Training\n\n');
 
 % Define system parameters
 framesize = 80;       % Framesize (samples)
@@ -44,6 +42,7 @@ frames_since_low_edge = 0;
 is_recording = 0;
 amplitude_threshold = -25;
 last_amplitudes = -Inf*ones(1000/25, 1); % One new amplitude compute every 25ms
+likelyhood_threshold = -80;
 % Keep acquiring data while "RUNNING" ~= 0
 while RUNNING
     % Acquire new input samples
@@ -84,19 +83,22 @@ while RUNNING
                         accueil_likelyhood = get_likelyhood(last_mfccs, accueil);
                         clic_likelyhood = get_likelyhood(last_mfccs, clic);
                         lacher_likelyhood = get_likelyhood(last_mfccs, lacher);
-                        menu_likelyhood = get_likelyhood(last_mfccs, menu);
                         retour_likelyhood = get_likelyhood(last_mfccs, retour);
                         tenir_likelyhood = get_likelyhood(last_mfccs, tenir);
-                        likelyhoods = [accueil_likelyhood clic_likelyhood lacher_likelyhood menu_likelyhood retour_likelyhood tenir_likelyhood];
+                        likelyhoods = [accueil_likelyhood clic_likelyhood lacher_likelyhood retour_likelyhood tenir_likelyhood];
                         %likelyhoods = likelyhoods/size(last_mfccs, 2);
-                        likelyhoods
+                        fprintf('Normalized max likelyhood: %f\n', max(likelyhoods)/size(last_mfccs, 2));
+                        fprintf('Likelyhoods: ');
+                        disp(likelyhoods);
                         %likelyhood_sum = mean([one_likelyhood three_likelyhood])
-                        if (max(likelyhoods) > -100 )
+                        if (max(likelyhoods) > likelyhood_threshold )
                             %last_datas = [last_datas(2:end); find(likelyhoods == min(likelyhoods))];
                             %last_detection = cputime;
                             %new_detection = 1;
                             found = find(likelyhoods == max(likelyhoods));
-                            words(found)
+                            disp(words(found));
+                        else
+                            disp('Not recognized');
                         end
                     end
                 end

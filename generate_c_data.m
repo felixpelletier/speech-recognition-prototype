@@ -22,6 +22,10 @@ fprintf(headerId, '#define TRAINING_DATA_GAUSSIAN_COUNT %i\n', NumComponents);
 
 fprintf(headerId, '\n');
 
+fprintf(headerId, '#define TRAINING_DATA_WORD_COUNT %i\n', length(words));
+
+fprintf(headerId, '\n');
+
 for i = 1:length(words)
     fprintf(headerId, '#define TRAINING_DATA_%s %i\n', upper(words{i}), i-1);
 end
@@ -42,7 +46,7 @@ fprintf(headerId, '} %s_t;\n', struct_name);
 
 fprintf(headerId, '\n');
 
-fprintf(headerId, 'extern const %s_t TRAINING_DATA[%i];\n', struct_name, length(words));
+fprintf(headerId, 'extern const %s_t TRAINING_DATA[TRAINING_DATA_WORD_COUNT];\n', struct_name);
 
 fprintf(headerId, '#endif //%s\n', guard_name);
 fclose(headerId);

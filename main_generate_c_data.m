@@ -1,13 +1,15 @@
-FILE_COUNT = 250;
-FILE_COUNT_FOR_TRAINING = 50;
 NumberMFCCKept = 12;
-NumberMFCCCalculated = 26;
+NumberMFCCCalculated = 22;
+MinimumAmplitude = -35;
+MaxNumberOfFiles = 100;
 
-%one = get_trained_matrix('google_dataset/one', 'NumberMFCCKept', NumberMFCCKept, 'NumberMFCCCalculated', NumberMFCCCalculated, 'MaxNumberOfFiles', FILE_COUNT_FOR_TRAINING);
-%two = get_trained_matrix('google_dataset/two', 'NumberMFCCKept', NumberMFCCKept, 'NumberMFCCCalculated', NumberMFCCCalculated, 'MaxNumberOfFiles', FILE_COUNT_FOR_TRAINING);
-%three = get_trained_matrix('google_dataset/three', 'NumberMFCCKept', NumberMFCCKept, 'NumberMFCCCalculated', NumberMFCCCalculated, 'MaxNumberOfFiles', FILE_COUNT_FOR_TRAINING);
+accueil = get_trained_matrix('new_dataset/accueil', 'NumberMFCCKept', NumberMFCCKept, 'NumberMFCCCalculated', NumberMFCCCalculated, 'MinimumAmplitude', MinimumAmplitude, 'MaxNumberOfFiles', MaxNumberOfFiles);
+clic = get_trained_matrix('new_dataset/clic', 'NumberMFCCKept', NumberMFCCKept, 'NumberMFCCCalculated', NumberMFCCCalculated, 'MinimumAmplitude', MinimumAmplitude, 'MaxNumberOfFiles', MaxNumberOfFiles);
+lacher = get_trained_matrix('new_dataset/lacher', 'NumberMFCCKept', NumberMFCCKept, 'NumberMFCCCalculated', NumberMFCCCalculated, 'MinimumAmplitude', MinimumAmplitude, 'MaxNumberOfFiles', MaxNumberOfFiles);
+retour = get_trained_matrix('new_dataset/retour', 'NumberMFCCKept', NumberMFCCKept, 'NumberMFCCCalculated', NumberMFCCCalculated, 'MinimumAmplitude', MinimumAmplitude, 'MaxNumberOfFiles', MaxNumberOfFiles);
+tenir = get_trained_matrix('new_dataset/tenir', 'NumberMFCCKept', NumberMFCCKept, 'NumberMFCCCalculated', NumberMFCCCalculated, 'MinimumAmplitude', MinimumAmplitude, 'MaxNumberOfFiles', MaxNumberOfFiles);
         
-word = {'one', 'two', 'three'};
-trained_matrices = {one, two, three};
+words = {'accueil', 'clic', 'lacher', 'retour', 'tenir'};
+trained_matrices = {accueil, clic, lacher, retour, tenir};
 
-generate_c_data(word, trained_matrices, 'c_version/training_data');
+generate_c_data(words, trained_matrices, 'c_version/training_data');
